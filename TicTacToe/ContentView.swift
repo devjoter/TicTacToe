@@ -39,9 +39,11 @@ struct ContentView: View {
                     ForEach(0..<3) { column in
                         Button(action: {
                             if cells[row][column] == nil {
-                                cells[row][column] = currentPlayer
-                                currentPlayer = currentPlayer == .x ? .o : .x
-                                checkWinner()
+                                withAnimation {
+                                    cells[row][column] = currentPlayer
+                                    currentPlayer = currentPlayer == .x ? .o : .x
+                                    checkWinner()
+                                }
                             }
                         }, label: {
                             ZStack {
@@ -53,7 +55,6 @@ struct ContentView: View {
                                     .font(.system(size: 50, weight: .bold))
                                     .foregroundColor(.white)
                                     .scaleEffect(winningCells.contains([row, column]) ? 1.2 : 1.0)
-                                    .animation(.easeInOut(duration: 0.5), value: cells[row][column])
                             }
                         })
                         .disabled(winner != nil)
@@ -68,13 +69,16 @@ struct ContentView: View {
                     .font(.title)
                     .foregroundColor(.orange)
                     .scaleEffect(2.0)
-                    .animation(.linear(duration: 0.5))
                     .padding(.vertical)
             }
             
             Spacer()
             
-            Button(action: resetGame) {
+            Button(action: {
+                withAnimation {
+                    resetGame()
+                }
+            }) {
                 Text("Reset Game")
                     .font(.title2)
                     .foregroundColor(.white)
@@ -107,9 +111,11 @@ struct ContentView: View {
         // Check rows
         for row in 0..<3 {
             if let player = cells[row][0], cells[row][1] == player, cells[row][2] == player {
-                winner = player
-                winningCells = Set([[row, 0], [row, 1], [row, 2]])
-                showingWinnerView = true
+                withAnimation {
+                    winner = player
+                    winningCells = Set([[row, 0], [row, 1], [row, 2]])
+                    showingWinnerView = true
+                }
                 return
             }
         }
@@ -117,31 +123,39 @@ struct ContentView: View {
         // Check columns
         for column in 0..<3 {
             if let player = cells[0][column], cells[1][column] == player, cells[2][column] == player {
-                winner = player
-                winningCells = Set([[0, column], [1, column], [2, column]])
-                showingWinnerView = true
+                withAnimation {
+                    winner = player
+                    winningCells = Set([[0, column], [1, column], [2, column]])
+                    showingWinnerView = true
+                }
                 return
             }
         }
         
         // Check diagonal
         if let player = cells[0][0], cells[1][1] == player, cells[2][2] == player {
-            winner = player
-            winningCells = Set([[0, 0], [1, 1], [2, 2]])
-            showingWinnerView = true
+            withAnimation {
+                winner = player
+                winningCells = Set([[0, 0], [1, 1], [2, 2]])
+                showingWinnerView = true
+            }
             return
         }
         
         if let player = cells[0][2], cells[1][1] == player, cells[2][0] == player {
-            winner = player
-            winningCells = Set([[0, 2], [1, 1], [2, 0]])
-            showingWinnerView = true
+            withAnimation {
+                winner = player
+                winningCells = Set([[0, 2], [1, 1], [2, 0]])
+                showingWinnerView = true
+            }
             return
         }
         
         // Check draw
         if !cells.flatMap({ $0 }).contains(nil) {
-            isDraw = true
+            withAnimation {
+                isDraw = true
+            }
         }
     }
     
@@ -159,5 +173,6 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
+
 
 
