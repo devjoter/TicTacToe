@@ -29,6 +29,7 @@ struct ContentView: View {
             
             if winner == nil && isDraw == false{
                 Text("Player \(currentPlayer.rawValue)'s turn")
+                    .font(.largeTitle)
                     .foregroundColor(currentPlayer == .x ? .red : .blue)
             }
             
