@@ -18,80 +18,80 @@ struct ContentView: View {
     @State private var winner: Player?
     @State private var isDraw: Bool = false
     @State private var winningCells: Set<[Int]> = []
+    @State private var showingWinnerView = false
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                Text("Tic Tac Toe")
-                    .font(.system(size: 40, weight: .bold))
-                    .padding(.vertical)
-                
-                Spacer()
-                
-                if winner == nil && isDraw == false {
-                    Text("Player \(currentPlayer.rawValue)'s turn")
-                        .font(.title2)
-                        .foregroundColor(currentPlayer == .x ? .red : .blue)
-                }
-                
-                ForEach(0..<3) { row in
-                    HStack(spacing: 20) {
-                        ForEach(0..<3) { column in
-                            Button(action: {
-                                if cells[row][column] == nil {
-                                    cells[row][column] = currentPlayer
-                                    currentPlayer = currentPlayer == .x ? .o : .x
-                                    checkWinner()
-                                }
-                            }, label: {
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .foregroundColor(currentColor(row, column))
-                                        .frame(width: 80, height: 80)
-                                        .shadow(radius: 5)
-                                    Text(cells[row][column]?.rawValue ?? "")
-                                        .font(.system(size: 50, weight: .bold))
-                                        .foregroundColor(.white)
-                                        .scaleEffect(winningCells.contains([row, column]) ? 1.2 : 1.0)
-                                        .animation(.easeInOut(duration: 0.5), value: cells[row][column])
-                                }
-                            })
-                            .disabled(winner != nil)
-                        }
+        VStack(spacing: 20) {
+            Text("Tic Tac Toe")
+                .font(.system(size: 40, weight: .bold))
+                .padding(.vertical)
+            
+            Spacer()
+            
+            if winner == nil && isDraw == false {
+                Text("Player \(currentPlayer.rawValue)'s turn")
+                    .font(.title2)
+                    .foregroundColor(currentPlayer == .x ? .red : .blue)
+            }
+            
+            ForEach(0..<3) { row in
+                HStack(spacing: 20) {
+                    ForEach(0..<3) { column in
+                        Button(action: {
+                            if cells[row][column] == nil {
+                                cells[row][column] = currentPlayer
+                                currentPlayer = currentPlayer == .x ? .o : .x
+                                checkWinner()
+                            }
+                        }, label: {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .foregroundColor(currentColor(row, column))
+                                    .frame(width: 80, height: 80)
+                                    .shadow(radius: 5)
+                                Text(cells[row][column]?.rawValue ?? "")
+                                    .font(.system(size: 50, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .scaleEffect(winningCells.contains([row, column]) ? 1.2 : 1.0)
+                                    .animation(.easeInOut(duration: 0.5), value: cells[row][column])
+                            }
+                        })
+                        .disabled(winner != nil)
                     }
                 }
-                
-                Spacer()
-                
-                if isDraw {
-                    Text("It's a draw!")
-                        .font(.title)
-                        .foregroundColor(.orange)
-                        .scaleEffect(2.0)
-                        .animation(.linear(duration: 0.5))
-                        .padding(.vertical)
-                }
-                
-                Spacer()
-                
-                Button(action: resetGame) {
-                    Text("Reset Game")
-                        .font(.title2)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.blue)
-                        .cornerRadius(10)
-                }
-                .padding(.horizontal)
-                
-                NavigationLink(destination: WinnerView(winner: winner ?? .x), isActive: .constant(winner != nil)) {
-                    EmptyView()
-                }
             }
-            .padding()
-            .background(Color(.systemGray6))
+            
+            Spacer()
+            
+            if isDraw {
+                Text("It's a draw!")
+                    .font(.title)
+                    .foregroundColor(.orange)
+                    .scaleEffect(2.0)
+                    .animation(.linear(duration: 0.5))
+                    .padding(.vertical)
+            }
+            
+            Spacer()
+            
+            Button(action: resetGame) {
+                Text("Reset Game")
+                    .font(.title2)
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.blue)
+                    .cornerRadius(10)
+            }
+            .padding(.horizontal)
         }
+        .padding()
+        .background(Color(.systemGray6))
+        .sheet(isPresented: $showingWinnerView, content: {
+            if let winner = winner {
+                WinnerView(winner: winner)
+            }
+        })
     }
     
     func currentColor(_ row: Int, _ column: Int) -> Color {
@@ -104,34 +104,42 @@ struct ContentView: View {
     }
     
     private func checkWinner() {
+        // Check rows
         for row in 0..<3 {
             if let player = cells[row][0], cells[row][1] == player, cells[row][2] == player {
                 winner = player
                 winningCells = Set([[row, 0], [row, 1], [row, 2]])
+                showingWinnerView = true
                 return
             }
         }
         
+        // Check columns
         for column in 0..<3 {
             if let player = cells[0][column], cells[1][column] == player, cells[2][column] == player {
                 winner = player
                 winningCells = Set([[0, column], [1, column], [2, column]])
+                showingWinnerView = true
                 return
             }
         }
         
+        // Check diagonal
         if let player = cells[0][0], cells[1][1] == player, cells[2][2] == player {
             winner = player
             winningCells = Set([[0, 0], [1, 1], [2, 2]])
+            showingWinnerView = true
             return
         }
         
         if let player = cells[0][2], cells[1][1] == player, cells[2][0] == player {
             winner = player
             winningCells = Set([[0, 2], [1, 1], [2, 0]])
+            showingWinnerView = true
             return
         }
         
+        // Check draw
         if !cells.flatMap({ $0 }).contains(nil) {
             isDraw = true
         }
@@ -150,8 +158,6 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
     }
-}
-
 }
 
 
