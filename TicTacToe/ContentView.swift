@@ -22,17 +22,16 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 20) {
             Text("Tic Tac Toe")
-                .font(.largeTitle)
+                .font(.system(size: 40, weight: .bold))
                 .padding(.vertical)
             
             Spacer()
             
-            if winner == nil && isDraw == false{
+            if winner == nil && isDraw == false {
                 Text("Player \(currentPlayer.rawValue)'s turn")
-                    .font(.title)
+                    .font(.title2)
                     .foregroundColor(currentPlayer == .x ? .red : .blue)
             }
-            
             
             ForEach(0..<3) { row in
                 HStack(spacing: 20) {
@@ -46,17 +45,17 @@ struct ContentView: View {
                         }, label: {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 10)
-                                    .foregroundColor(currectColor(row, column))
+                                    .foregroundColor(currentColor(row, column))
                                     .frame(width: 80, height: 80)
                                     .shadow(radius: 5)
                                 Text(cells[row][column]?.rawValue ?? "")
-                                    .font(.largeTitle)
+                                    .font(.system(size: 50, weight: .bold))
                                     .foregroundColor(.white)
+                                    .scaleEffect(winningCells.contains([row, column]) ? 1.2 : 1.0)
+                                    .animation(.easeInOut(duration: 0.5), value: cells[row][column])
                             }
                         })
-                        .disabled(winner == nil ? false : true)
-                        .scaleEffect(winningCells.contains([row, column]) ? 1.2 : 1.0)
-                        .animation(.easeInOut(duration: 0.5))
+                        .disabled(winner != nil)
                     }
                 }
             }
@@ -81,21 +80,25 @@ struct ContentView: View {
             
             Spacer()
             
-            Button("Reset Game", action: resetGame)
-                .font(.title)
-                .foregroundColor(.white)
-                .padding(.vertical)
-                .frame(maxWidth: .infinity)
-                .background(Color.blue)
-                .cornerRadius(10)
+            Button(action: resetGame) {
+                Text("Reset Game")
+                    .font(.title2)
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.blue)
+                    .cornerRadius(10)
+            }
+            .padding(.horizontal)
         }
         .padding()
+        .background(Color(.systemGray6))
     }
     
-    func currectColor(_ row:Int,_ column:Int)->Color{
+    func currentColor(_ row: Int, _ column: Int) -> Color {
         if cells[row][column] == .x {
             return .red
-        }else if cells[row][column] == .o {
+        } else if cells[row][column] == .o {
             return .blue
         }
         return .gray
@@ -147,8 +150,10 @@ struct ContentView: View {
         winningCells = Set()
     }
 }
+
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
     }
 }
+
