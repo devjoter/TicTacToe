@@ -29,7 +29,7 @@ struct ContentView: View {
             
             if winner == nil && isDraw == false{
                 Text("Player \(currentPlayer.rawValue)'s turn")
-                    .font(.largeTitle)
+                    .font(.title)
                     .foregroundColor(currentPlayer == .x ? .red : .blue)
             }
             
@@ -65,12 +65,14 @@ struct ContentView: View {
             
             if let winner = winner {
                 Text("Player \(winner.rawValue) wins!")
+                    .font(.title)
                     .foregroundColor(.green)
                     .scaleEffect(2.0)
                     .animation(.linear(duration: 0.5))
                     .padding(.vertical)
             } else if isDraw {
                 Text("It's a draw!")
+                    .font(.title)
                     .foregroundColor(.orange)
                     .scaleEffect(2.0)
                     .animation(.linear(duration: 0.5))
@@ -80,6 +82,7 @@ struct ContentView: View {
             Spacer()
             
             Button("Reset Game", action: resetGame)
+                .font(.title)
                 .foregroundColor(.white)
                 .padding(.vertical)
                 .frame(maxWidth: .infinity)
